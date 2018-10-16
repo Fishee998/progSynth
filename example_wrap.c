@@ -2983,13 +2983,14 @@ SWIG_Python_NonDynamicSetAttr(PyObject *obj, PyObject *name, PyObject *value) {
 #define SWIGTYPE_p_cond swig_types[1]
 #define SWIGTYPE_p_double swig_types[2]
 #define SWIGTYPE_p_exp_ swig_types[3]
-#define SWIGTYPE_p_organism swig_types[4]
-#define SWIGTYPE_p_p_Expr swig_types[5]
-#define SWIGTYPE_p_p_program swig_types[6]
-#define SWIGTYPE_p_program swig_types[7]
-#define SWIGTYPE_p_treenode swig_types[8]
-static swig_type_info *swig_types[10];
-static swig_module_info swig_module = {swig_types, 9, 0, 0, 0, 0};
+#define SWIGTYPE_p_int swig_types[4]
+#define SWIGTYPE_p_organism swig_types[5]
+#define SWIGTYPE_p_p_Expr swig_types[6]
+#define SWIGTYPE_p_p_program swig_types[7]
+#define SWIGTYPE_p_program swig_types[8]
+#define SWIGTYPE_p_treenode swig_types[9]
+static swig_type_info *swig_types[11];
+static swig_module_info swig_module = {swig_types, 10, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3035,14 +3036,37 @@ program* neicun()
     program* newcandidate = (program*)malloc(sizeof(program));
     return newcandidate;
 }
+
 program* set_fitness(program* org, double fitnessValue)
 {
     org->fitness = fitnessValue;
     return org;
 }
+
 double get_fitness(program* org)
 {
     return org->fitness;
+}
+
+int illegal(program* org)
+{
+    return org->illegal;
+}
+int action2Len(int* action2)
+{
+    return sizeof(action2);
+}
+int get_action2(int* action2, int index)
+{
+    return action2[index];
+}
+double getPropertyfit(program* org)
+{
+    return org->propertyfit[0];
+}
+int getCheckedBySpin(program* org)
+{
+    return org->checkedBySpin;
 }
 
 
@@ -3349,6 +3373,178 @@ SWIGINTERN PyObject *_wrap_get_fitness(PyObject *SWIGUNUSEDPARM(self), PyObject 
   arg1 = (program *)(argp1);
   result = (double)get_fitness(arg1);
   resultobj = SWIG_From_double((double)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_illegal(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  program *arg1 = (program *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:illegal",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_program, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "illegal" "', argument " "1"" of type '" "program *""'"); 
+  }
+  arg1 = (program *)(argp1);
+  result = (int)illegal(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_action2Len(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int *arg1 = (int *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:action2Len",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "action2Len" "', argument " "1"" of type '" "int *""'"); 
+  }
+  arg1 = (int *)(argp1);
+  result = (int)action2Len(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_get_action2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int *arg1 = (int *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:get_action2",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "get_action2" "', argument " "1"" of type '" "int *""'"); 
+  }
+  arg1 = (int *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "get_action2" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  result = (int)get_action2(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_getPropertyfit(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  program *arg1 = (program *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  double result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:getPropertyfit",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_program, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "getPropertyfit" "', argument " "1"" of type '" "program *""'"); 
+  }
+  arg1 = (program *)(argp1);
+  result = (double)getPropertyfit(arg1);
+  resultobj = SWIG_From_double((double)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_getCheckedBySpin(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  program *arg1 = (program *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:getCheckedBySpin",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_program, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "getCheckedBySpin" "', argument " "1"" of type '" "program *""'"); 
+  }
+  arg1 = (program *)(argp1);
+  result = (int)getCheckedBySpin(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_spin_(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  program *arg1 = (program *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:spin_",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_program, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "spin_" "', argument " "1"" of type '" "program *""'"); 
+  }
+  arg1 = (program *)(argp1);
+  result = (int)spin_(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_getLegalAction2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  program *arg1 = (program *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  int *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:getLegalAction2",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_program, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "getLegalAction2" "', argument " "1"" of type '" "program *""'"); 
+  }
+  arg1 = (program *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "getLegalAction2" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  result = (int *)getLegalAction2(arg1,arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_int, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -3842,6 +4038,13 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"neicun", _wrap_neicun, METH_VARARGS, NULL},
 	 { (char *)"set_fitness", _wrap_set_fitness, METH_VARARGS, NULL},
 	 { (char *)"get_fitness", _wrap_get_fitness, METH_VARARGS, NULL},
+	 { (char *)"illegal", _wrap_illegal, METH_VARARGS, NULL},
+	 { (char *)"action2Len", _wrap_action2Len, METH_VARARGS, NULL},
+	 { (char *)"get_action2", _wrap_get_action2, METH_VARARGS, NULL},
+	 { (char *)"getPropertyfit", _wrap_getPropertyfit, METH_VARARGS, NULL},
+	 { (char *)"getCheckedBySpin", _wrap_getCheckedBySpin, METH_VARARGS, NULL},
+	 { (char *)"spin_", _wrap_spin_, METH_VARARGS, NULL},
+	 { (char *)"getLegalAction2", _wrap_getLegalAction2, METH_VARARGS, NULL},
 	 { (char *)"mutation1", _wrap_mutation1, METH_VARARGS, NULL},
 	 { (char *)"printAst", _wrap_printAst, METH_VARARGS, NULL},
 	 { (char *)"set_coef", _wrap_set_coef, METH_VARARGS, NULL},
@@ -3866,6 +4069,7 @@ static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_cond = {"_p_cond", "cond *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_double = {"_p_double", "double *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_exp_ = {"_p_exp_", "exp_ *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_int = {"_p_int", "int *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_organism = {"_p_organism", "organism *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_Expr = {"_p_p_Expr", "Expr **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_program = {"_p_p_program", "program **", 0, 0, (void*)0, 0};
@@ -3877,6 +4081,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_cond,
   &_swigt__p_double,
   &_swigt__p_exp_,
+  &_swigt__p_int,
   &_swigt__p_organism,
   &_swigt__p_p_Expr,
   &_swigt__p_p_program,
@@ -3888,6 +4093,7 @@ static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0,
 static swig_cast_info _swigc__p_cond[] = {  {&_swigt__p_cond, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_double[] = {  {&_swigt__p_double, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_exp_[] = {  {&_swigt__p_exp_, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_int[] = {  {&_swigt__p_int, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_organism[] = {  {&_swigt__p_organism, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_Expr[] = {  {&_swigt__p_p_Expr, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_program[] = {  {&_swigt__p_p_program, 0, 0, 0},{0, 0, 0, 0}};
@@ -3899,6 +4105,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_cond,
   _swigc__p_double,
   _swigc__p_exp_,
+  _swigc__p_int,
   _swigc__p_organism,
   _swigc__p_p_Expr,
   _swigc__p_p_program,

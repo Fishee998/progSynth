@@ -647,6 +647,139 @@ int checkEnterCS(trace* t)        //M:1 B1:2 B2:3 O1:4 O2:5
         return 1;
 }
 
+
+int* getLegalAction2(program* parent, int nodeNum)
+{
+    program* newprog = copyProgram(parent);
+    newprog->checkedBySpin = 0;
+    treenode* chnode = findNode(newprog->root, newprog, nodeNum);
+    if (chnode == NULL) {
+        newprog->illegal = 1;
+        printf("treenode1 error");
+    }
+    //Replacement Mutation type
+    treenode* mnode = chnode;
+    int* action = (int*)malloc(sizeof(int)*50);
+    int index = 0;
+    for (int actionNum = 0; actionNum < 50; actionNum++) {
+        if (actionNum >= 0 && actionNum < 3 )
+        {
+            if (mnode->fixed == 0) {
+                switch (actionNum) {
+                    case 0:
+                        action[index] = actionNum;
+                        index++;
+                        break;
+                    case 1:
+                        if (mnode->depth == 3) {
+                            action[index] = actionNum;
+                            index++;
+                        }
+                        break;
+                    case 2:
+                        if (mnode->depth == 3) {
+                            action[index] = actionNum;
+                            index++;
+                        }
+                        break;
+                }
+            }
+        }
+        else if(actionNum >= 3 && actionNum < 31)
+        {
+            if(mnode->cond1 != NULL)
+            {
+                if (actionNum >= 3 && actionNum < 12)
+                {
+                    if(mnode->cond1->type == 1 || mnode->cond1->type == 2 || mnode->cond1->type == 3 || mnode->cond1->type == 4)
+                    {
+                    action[index] = actionNum;
+                    index++;
+                    }
+                }
+                else if (actionNum >= 12 && actionNum < 21)
+                {
+                    if (mnode->cond1->type == 3 || mnode->cond1->type == 4)
+                    {
+                        action[index] = actionNum;
+                        index++;
+                    }
+                }
+                else if(actionNum >= 21 && actionNum < 25)
+                {
+                    if (mnode->cond1->type == 1 || mnode->cond1->type == 2)
+                    {
+                        action[index] = actionNum;
+                        index++;
+                    }
+                }
+                else if (action >= 25 && action < 31)
+                {
+                    if (mnode->cond1->type == 3 || mnode->cond1->type == 4)
+                    {
+                        action[index] = actionNum;
+                        index++;
+                    }
+                }
+            }
+        }
+        else if(actionNum >= 31 && actionNum < 40)
+        {
+            if (mnode->exp1 != NULL)
+            {
+                action[index] = actionNum;
+                index++;
+            }
+        }
+        else if(actionNum >= 40 && actionNum < 42)
+        {
+            if(mnode->fixed == 1 || mnode->depth + mnode->height == newprog->maxdepth + 1 || mnode->depth == 2)
+            {
+                int illegal = 1;
+            }
+            else
+            {
+                action[index] = actionNum;
+                index++;
+            }
+        }
+        else if(actionNum >= 42 && actionNum < 48 )
+        {
+            if(!(mnode->depth != 1 && mnode->numofstatements < 6 && mnode->depth == 2) && !(mnode->depth != 1 && mnode->numofstatements < 2 && mnode->depth != 2))
+            {
+                int illegal = 1;
+            }
+            else
+            {
+                action[index] = actionNum;
+                index++;
+            }
+        }
+        else if(actionNum >= 48 && actionNum < 50)
+        {
+            switch (actionNum) {
+                case 48:
+                    if (mnode->treenode1 != NULL && mnode->treenode1->fixed == 0 && (mnode->treenode2 == NULL || mnode->treenode2->fixed == 0))
+                    {
+                        action[index] = actionNum;
+                        index++;
+                    }
+                    break;
+                case 49:
+                    if (mnode->treenode2 != NULL && mnode->treenode2->fixed == 0 && (mnode->treenode1 == NULL && mnode->treenode1->fixed == 0 ))
+                    {
+                        action[index] = actionNum;
+                        index++;
+                    }
+                    break;
+            }
+        }
+        action[index] = '\n';
+        
+    }
+    return action;
+}
+
 void calculateFitness2(organism* prog,int type)
 {
     int M = 0,B1 = 0,B2 = 0,O1 = 0,O2 = 0,B3 = 0,O3 = 0;//,BM = 0;
@@ -997,7 +1130,7 @@ exp_* genexp(program* prog,int vartype)
 exp_* genexp_(program* prog,int vartype, int assignRandom)
 {
     //exptype 0 : varindex 0 1 2 3
-    //exptype 0 : varindex 0 1 2 3 4
+    //exptype 1 : varindex 0 1 2 3 4
     int exptype = assignRandom / 10;
     int varindex = assignRandom % 10;
     if(vartype != -1)
@@ -1087,7 +1220,7 @@ cond* gencond_(program* prog,int type, long condRandom_)    //type==3:true,==,!=
 void outputLog_(char* str)
 {
     FILE *fp;
-    fp = fopen("/Users/zhuang/workspace-gp/testSwig2/log.txt", "a");
+    fp = fopen("./log.txt", "a");
     fprintf(fp, "%s", str);
     fclose(fp);
 }
@@ -1366,10 +1499,12 @@ treenode* findNode(treenode* root, program* prog, int number)
             }
             break;
             
-        case 4:if(root->number == number)
+        case 4:
+            if(root->number == number)
                 result = root;
             break;
-        case 5:if(root->number == number)
+        case 5:
+            if(root->number == number)
         {
             printf("wrong number");
             result = NULL;
@@ -1433,7 +1568,7 @@ void printAst(program* prog)
     s = newprintprog(prog->root,prog,s);
     s[strlen(s) - 1] = 0;
     FILE *fp;
-    fp = fopen("/Users/zhuang/workspace-gp/testSwig2/data/ast.txt","w+");
+    fp = fopen("./data/ast.txt","w+");
     fprintf(fp,"%s",s);
     fclose(fp);
 }
@@ -1458,7 +1593,7 @@ int setTreenodeNum(treenode* root, program* prog, int number)
             break;
             
         case 3: number = setTreenodeNum(root->treenode1,prog,number);
-            printf(" ");
+            //printf(" ");
             number = setTreenodeNum(root->treenode2,prog,number);
             break;
             
@@ -3702,7 +3837,7 @@ double* set_coef(int numofrequirements)
     double* coef = (double*)malloc(sizeof(double) * numofrequirements);
     coef[0] = 0.6;coef[1] = 0.2;coef[2] = 0;coef[3] = 0;
     coef[4] = 0.2;coef[5] = -0.1;coef[6] = -0.2;
-    printf("x1\n");
+    // printf("x1\n");
     return coef;
 }
 
@@ -3717,13 +3852,13 @@ Expr** set_requirments(int numofrequirements)
         char buf[255];
         switch(i)
         {
-            case 0:fp = fopen("/Users/zhuang/workspace-gp/testSwig2/property/M.bltl","r");break;
-            case 1:fp = fopen("/Users/zhuang/workspace-gp/testSwig2/property/B1.bltl","r");break;
-            case 2:fp = fopen("/Users/zhuang/workspace-gp/testSwig2/property/B2.bltl","r");break;
-            case 3:fp = fopen("/Users/zhuang/workspace-gp/testSwig2/property/B3.bltl","r");break;
-            case 4:fp = fopen("/Users/zhuang/workspace-gp/testSwig2/property/O1.bltl","r");break;
-            case 5:fp = fopen("/Users/zhuang/workspace-gp/testSwig2/property/O2.bltl","r");break;
-            case 6:fp = fopen("/Users/zhuang/workspace-gp/testSwig2/property/O3.bltl","r");break;
+            case 0:fp = fopen("./property/M.bltl","r");break;
+            case 1:fp = fopen("./property/B1.bltl","r");break;
+            case 2:fp = fopen("./property/B2.bltl","r");break;
+            case 3:fp = fopen("./property/B3.bltl","r");break;
+            case 4:fp = fopen("./property/O1.bltl","r");break;
+            case 5:fp = fopen("./property/O2.bltl","r");break;
+            case 6:fp = fopen("./property/O3.bltl","r");break;
         }
         
         fgets(buf, 255, fp);
@@ -3746,8 +3881,8 @@ Expr** set_requirments(int numofrequirements)
         Expr* e = generateStepExpr(buf,0,strlen(buf) - 1);
         //printf("xy,%d,%d\n",i,sizeof(requirements));
         requirements[i] = e;
-        printExpr(e);
-        printf("\n");
+        //printExpr(e);
+        //printf("\n");
         
     }
     
@@ -3765,14 +3900,270 @@ Expr** set_requirments(int numofrequirements)
     return requirements;
 }
 
-//mutation 1
-program* mutation1(program* parent, int nodeNum, int actionType)
+
+int mutationCond_(cond* root,program* prog,int type, int action)    //type == 1:can add        type == 0:can't add
 {
+    long condRandom = 0;
+    int illegal = 0;
+    if(root == NULL)
+        return 1;
+    if(root->type == -1)
+        return 1;
+    if(root->type == 0)
+    {    //printf("0");
+        cond* new = gencond(prog,3);
+        while(new->type == 0)
+        {
+            freeAll(NULL, NULL, NULL, new, NULL, 4);
+            // free(new);
+            new = gencond(prog,3);
+        }
+        root->type = new->type;
+        root->exp1 = new->exp1;
+        root->exp2 = new->exp2;
+        root->cond1 = new->cond1;
+        root->cond2 = new->cond2;
+        // freeAll(NULL, NULL, NULL, new, NULL, 4);
+        free(new);
+    }
+    if (action > 2 && action < 12)
+    {
+        if (root->type == 1 || root->type == 2)
+            switch (action)
+        {
+            case 3:
+                root->exp1 = genexp_(prog, 1, 10);
+                break;
+            case 4:
+                root->exp1 = genexp_(prog, 1, 11);
+                break;
+            case 5:
+                root->exp1 = genexp_(prog, 1, 12);
+                break;
+            case 6:
+                root->exp1 = genexp_(prog, 1, 13);
+                break;
+            case 7:
+                root->exp1 = genexp_(prog, 1, 14);
+                break;
+            case 8:
+                root->exp2 = genexp_(prog, 0, 0);
+                break;
+            case 9:
+                root->exp2 = genexp_(prog, 0, 1);
+                break;
+            case 10:
+                root->exp2 = genexp_(prog, 0, 2);
+                break;
+            case 11:
+                root->exp2 = genexp_(prog, 0, 3);
+                break;
+        }
+        else if (root->type == 3 || root->type == 4)
+        {
+            switch (action)
+            {
+                case 3:
+                    root->cond1->exp1 = genexp_(prog, 1, 10);
+                    break;
+                case 4:
+                    root->cond1->exp1 = genexp_(prog, 1, 11);
+                    break;
+                case 5:
+                    root->cond1->exp1 = genexp_(prog, 1, 12);
+                    break;
+                case 6:
+                    root->cond1->exp1 = genexp_(prog, 1, 13);
+                    break;
+                case 7:
+                    root->cond1->exp1 = genexp_(prog, 1, 14);
+                    break;
+                case 8:
+                    root->cond1->exp2 = genexp_(prog, 0, 0);
+                    break;
+                case 9:
+                    root->cond1->exp2 = genexp_(prog, 0, 1);
+                    break;
+                case 10:
+                    root->cond1->exp2 = genexp_(prog, 0, 2);
+                    break;
+                case 11:
+                    root->cond1->exp2 = genexp_(prog, 0, 3);
+                    break;
+            }
+        }
+        else
+            illegal = 1;
+    }
+    else if (action > 11 && action < 21)
+    {
+        if (root->type == 3 || root->type == 4)
+        {
+            
+            switch (action)
+            {
+                case 12:
+                    
+                    root->cond2->exp1 = genexp_(prog, 1, 10);
+                    break;
+                case 13:
+                    root->cond2->exp1 = genexp_(prog, 1, 11);
+                    break;
+                case 14:
+                    root->cond2->exp1 = genexp_(prog, 1, 12);
+                    break;
+                case 15:
+                    root->cond2->exp1 = genexp_(prog, 1, 13);
+                    break;
+                case 16:
+                    root->cond2->exp1 = genexp_(prog, 1, 14);
+                    break;
+                case 17:
+                    root->cond2->exp2 = genexp_(prog, 0, 0);
+                    break;
+                case 18:
+                    root->cond2->exp2 = genexp_(prog, 0, 1);
+                    break;
+                case 19:
+                    root->cond2->exp2 = genexp_(prog, 0, 2);
+                    break;
+                case 20:
+                    
+                    root->cond2->exp2 = genexp_(prog, 0, 3);
+                    break;
+            }
+        }
+        else
+            illegal = 1;
+    }
+    else if (action > 20 && action < 24)
+    {
+        if (root->type == 1 || root->type == 2)
+        {
+            cond* c1 = NULL;
+            switch (action)
+            {
+                case 21:
+                    root->type = 3 - root->type;
+                    break;
+                case 22:
+                    // freeAll(NULL, NULL, NULL, root, NULL, 4);
+                    // free(root);
+                    free(root->exp1);
+                    free(root->exp2);
+                    cond* new;
+                    if(type == 1)
+                    {
+                        condRandom = 321112100;
+                        new = gencond_(prog,5, condRandom);
+                    }
+                    else
+                    {
+                        condRandom = 2100;
+                        new = gencond_(prog,3, condRandom );
+                    }
+                    root->type = new->type;
+                    root->exp1 = new->exp1;
+                    root->exp2 = new->exp2;
+                    root->cond1 = new->cond1;
+                    root->cond2 = new->cond2;
+                    //freeAll(NULL, NULL, NULL, new, NULL, 4);
+                    free(new);
+                    break;
+                case 23:
+                    condRandom = 2100;
+                    c1 = copyCond(root);
+                    free(root->exp1);
+                    root->exp1 = NULL;
+                    free(root->exp2);
+                    root->exp2 = NULL;
+                    // root->type = nextrand(2) + 3;
+                    root->type = 3;
+                    root->cond1 = c1;
+                    root->cond2 = gencond_(prog,3, condRandom);
+                    break;
+                case 24:
+                    condRandom = 2100;
+                    c1 = copyCond(root);
+                    // freeAll(NULL, NULL, NULL, NULL, root->exp1, 5);
+                    free(root->exp1);
+                    root->exp1 = NULL;
+                    freeAll(NULL, NULL, NULL, NULL, root->exp2, 5);
+                    // free(root->exp2);
+                    root->exp2 = NULL;
+                    // root->type = nextrand(2) + 3;
+                    root->type = 4;
+                    root->cond1 = c1;
+                    root->cond2 = gencond_(prog,3, condRandom);
+                    break;
+            }
+        }
+        else
+            illegal = 1;
+    }
+    else if (action > 24 && action < 31)
+    {
+        if (root->type == 3 || root->type == 4)
+        {
+            switch (action)
+            {
+                case 25:
+                    mutationCond_(root->cond1,prog,0, 22);
+                    break;
+                case 26:
+                    root->type = 7 - root->type;
+                    break;
+                case 27:
+                    mutationCond_(root->cond2,prog,0, 22);
+                    break;
+                case 28:
+                    root->type = root->cond1->type;
+                    root->exp1 = root->cond1->exp1;
+                    root->exp2 = root->cond1->exp2;
+                    // freeAll(NULL, NULL, NULL, root->cond1, NULL, 4);
+                    free(root->cond1);
+                    root->cond1 = NULL;
+                    freeAll(NULL, NULL, NULL, root->cond2, NULL, 4);
+                    root->cond2 = NULL;
+                    break;
+                case 29:
+                    root->type = root->cond2->type;
+                    root->exp1 = root->cond2->exp1;
+                    root->exp2 = root->cond2->exp2;
+                    freeAll(NULL, NULL, NULL, root->cond1, NULL, 4);
+                    root->cond1 = NULL;
+                    // freeAll(NULL, NULL, NULL, root->cond2, NULL, 4);
+                    free(root->cond2);
+                    root->cond2 = NULL;
+                    break;
+                case 30:
+                    // free(root->cond1);
+                    // free(root->cond2);
+                    freeAll(NULL, NULL, NULL, root->cond1, NULL, 4);
+                    freeAll(NULL, NULL, NULL, root->cond2, NULL, 4);
+                    condRandom = 311212100;
+                    cond* new = gencond_(prog,5, condRandom);
+                    root->type = new->type;
+                    root->exp1 = new->exp1;
+                    root->exp2 = new->exp2;
+                    root->cond1 = new->cond1;
+                    root->cond2 = new->cond2;
+                    // freeAll(NULL, NULL, NULL, new, NULL, 4);
+                    free(new);
+                    break;
+            }
+        }
+        else
+            illegal = 1;
+    }
+    return  illegal;
     
-    // action
-    //int commandtypeVarindex[] = action[0];
-    //int assignRandom[4] = action[1];
-    // long condrandom[2][2] = action[2];
+}
+//mutation 1
+program* mutation1(program* parent, int nodeNum, int actionNum)
+{
+    int mutationtype = 0;
+    int illegal = 0;
     int commandtypeVarindex[2];
     int assignRandom;
     long condrandom;
@@ -3781,58 +4172,53 @@ program* mutation1(program* parent, int nodeNum, int actionType)
     treenode* new = newprog->root;
     treenode* chnode = findNode(newprog->root, newprog, nodeNum);
     if (chnode == NULL) {
-        outputLog_("nodeNum error");
+        newprog->illegal = 1;
+        return newprog;
     }
-    action* action_ = (action*)malloc(sizeof(action));
-    action_ = setAction(chnode->depth, actionType);
-    if (chnode->depth == 2 || chnode->depth == 4)
-    {
-        if (action_->commandtypeVarindex[0] != 2 && action_->commandtypeVarindex[0] != 3)
-            outputLog_("depth24 commandtypeVarindex[0] error");
-        if (action_->assignRandom < 0 || (action_->assignRandom > 3 && action_->assignRandom < 10) || action_->assignRandom > 14)
-        {
-            outputLog_("depth24 assignRandom error");
-        }
-    }
-    else{
-        if(action_->commandtypeVarindex[0] != 10 && action_->commandtypeVarindex[0] != 20)
-            outputLog_("depth3 commandtypeVarindex[0] error");
-        
-        if (action_->commandtypeVarindex[1] != 2 && action_->commandtypeVarindex[1] != 3) {
-            outputLog_("depth3 commandtypeVarindex[1] error");
-        }
-        if (action_->assignRandom ) {
-            if (action_->assignRandom < 0 || (action_->assignRandom > 3 && action_->assignRandom < 10) || action_->assignRandom > 14)
-            {
-                outputLog_("depth3 assignRandom error");
-            }
-        }
-        // condrandom in genCond
-        
-    }
-    //printf("mutationtype = %d\n",mutationtype);
-    int mutationtype = 1;
-    
     mutype = mutationtype;
-    if(mutationtype == 1)                            //Replacement Mutation type
+    newprog->illegal = 0;
+    //Replacement Mutation type
+    treenode* mnode = chnode;
+    if (actionNum >= 0 && actionNum < 3 )
     {
-        treenode* mnode = chnode;
-        if(mnode->fixed == 0 && (mnode->cond1 == NULL && mnode->exp1 == NULL || nextrand(2) == 0))
+        if(mnode->fixed == 0)
         {
-            treenode* newnode;
-            if(mnode->depth == 2 || mnode->depth == 4)
+            treenode* newnode = NULL;
+            switch (actionNum)
             {
-                commandtypeVarindex[0] = action_->commandtypeVarindex[0];
-                assignRandom = action_->assignRandom;
-                newnode = genprog_(mnode->depth,newprog, commandtypeVarindex, assignRandom,NULL, 0);
-            }
-            else
-            {
-                commandtypeVarindex[0] = action_->commandtypeVarindex[0];
-                commandtypeVarindex[1] = action_->commandtypeVarindex[1];
-                assignRandom = action_->assignRandom;
-                condrandom = action_->condrandom;
-                newnode = genprog_(newprog->maxdepth,newprog, commandtypeVarindex, assignRandom,condrandom, 0);
+                case 0:
+                    commandtypeVarindex[0] = 2;
+                    assignRandom = 0;
+                    newnode = genprog_(mnode->depth,newprog, commandtypeVarindex, assignRandom,NULL, 0);
+                    break;
+                case 1:
+                    if (mnode->depth == 3) {
+                        commandtypeVarindex[0] = 10;
+                        commandtypeVarindex[1] = 2;
+                        assignRandom = 11;
+                        condrandom = 311001111;
+                        newnode = genprog_(newprog->maxdepth,newprog, commandtypeVarindex, assignRandom,condrandom, 0);
+                    }
+                    else
+                    {
+                        newprog->illegal = 1;
+                        return newprog;
+                    }
+                    break;
+                case 2:
+                    if (mnode->depth == 3) {
+                        commandtypeVarindex[0] = 20;
+                        commandtypeVarindex[1] = 2;
+                        assignRandom = 11;
+                        condrandom = 311001111;
+                        newnode = genprog_(newprog->maxdepth,newprog, commandtypeVarindex, assignRandom,condrandom, 0);
+                    }
+                    else
+                    {
+                        newprog->illegal = 1;
+                        return newprog;
+                    }
+                    break;
             }
             if(mnode->parent == NULL)
                 new = newnode;
@@ -3848,163 +4234,356 @@ program* mutation1(program* parent, int nodeNum, int actionType)
         }
         else
         {
-            if(mnode->exp1 == NULL || (mnode->cond1 != NULL && nextrand(2) == 0))
-                mutationCond(mnode->cond1,newprog,1);
-            else
-            {
-                if(nextrand(2) == 0)
-                {
-                    exp_* e;
-                    do
-                    {
-                        e = genexp(newprog,0);
-                    }while(equalExp(e,mnode->exp1) == 1);
-                    free(mnode->exp1);
-                    mnode->exp1 = e;
-                    
-                }
-                else
-                {
-                    mnode->index = 5 - mnode->index;    //5 = 2 + me
-                }
-            }
+            newprog->illegal = 1;
+            return newprog;
         }
     }
-    else if(mutationtype == 2)                        //Insert Mutation types
-    {    //printf("mutation222\n");
-        
-        treenode* mnode = chnode;
-        free(chnode);
-        //printf("2 mnode depth:%d,type%d\n",mnode->depth,mnode->type);
-        //printf("mutation2233\n");
-        //int t = nextrand(4);
-        int t = nextrand(3);
-        if(t == 2)
-            t = 3;
-        if(mnode->fixed == 1 || mnode->depth + mnode->height == newprog->maxdepth + 1 || mnode->depth == 2)
-            t = 3;
-        //printf("2 mnode depth:%d,type:%d,t=%d fixed:%d\n",mnode->depth,mnode->type,t,mnode->fixed);
-        
-        treenode* newnode = createTreenode(t,0,NULL,NULL,NULL,NULL);
-        
-        if(t == 0 || t == 1)    //if,while
-        {
-            newnode->cond1 = gencond(newprog,5);
-            newnode->treenode1 = mnode;
-            if(mnode->parent == NULL)
-            {    //printf("first\n");
-                mnode->parent = newnode;
-                new = newnode;
-            }
-            else
-            {   // treenode* pp =  mnode->parent;
-                //printf("second:parent type:%d\n",mnode->parent->type);
-                if(mnode->parent->treenode1 == mnode)
-                    mnode->parent->treenode1 = newnode;
-                else if(mnode->parent->treenode2 == mnode)
-                    mnode->parent->treenode2 = newnode;
-                else
-                    printf("mutation type2 error!\n");
-                //printf("1pptype:%d\n",pp->type);
-                //printf("1ppdepth:%d\n",pp->depth);
-                newnode->parent = mnode->parent;
-                mnode->parent = newnode;
-                //printf("before\n");
-                //printf("2pptype:%d\n",pp->type);
-                //printf("2ppdepth:%d\n",pp->depth);
-                //printType(pp);
-                //printf("after\n");
-            }
-        }
-        else
-        {
-            int p;
-            if(getStatement(mnode,1)->type == 1)
-                p = 1;
-            else if(getStatement(mnode,0)->type == 5)
-                p = 0;
-            else
-                p = nextrand(2);
-            
-            if(p == 0)
-            {
-                newnode->treenode1 = mnode;
-                if(mnode->depth == 2)
-                    newnode->treenode2 = genprog(newprog->maxdepth,newprog);
-                else
-                    newnode->treenode2 = genprog(mnode->depth,newprog);
-            }
-            else
-            {
-                newnode->treenode2 = mnode;
-                if(mnode->depth == 2)
-                    newnode->treenode1 = genprog(newprog->maxdepth,newprog);
-                else
-                    newnode->treenode1 = genprog(mnode->depth,newprog);
-            }
-            
-            if(mnode->parent == NULL)
-            {
-                mnode->parent = newnode;
-                new = newnode;
-            }
-            else
-            {
-                if(mnode->parent->treenode1 == mnode)
-                    mnode->parent->treenode1 = newnode;
-                else
-                    mnode->parent->treenode2 = newnode;
-                newnode->parent = mnode->parent;
-                mnode->parent = newnode;
-            }
-        }
-        //printf("newnodetype%d\n",newnode->type);
-    }
-    else if(mutationtype == 3)                        //Reduction Mutation type
+    else if (actionNum >= 3 && actionNum < 31 )
     {
-        treenode* mnode = chnode;
-        free(chnode);
-        int child = nextrand(2);
-        if(mnode->treenode1->fixed == 1 || mnode->treenode2 == NULL || child == 0 && mnode->treenode2->fixed == 0)//treenode1 replace mnode
+        if(mnode->cond1 != NULL)
         {
-            if(mnode->parent == NULL)    //mnode == new
+            newprog->illegal = mutationCond_(mnode->cond1,newprog,1,actionNum);
+            if (newprog->illegal == 1)
             {
-                new = mnode->treenode1;
-                new->parent = NULL;
+                return newprog;
             }
-            else                         //mnode != new
-            {
-                mnode->treenode1->parent = mnode->parent;
-                if(mnode->parent->treenode1 == mnode)
-                    mnode->parent->treenode1 = mnode->treenode1;
-                else
-                    mnode->parent->treenode2 = mnode->treenode1;
-            }
-            free(mnode);
         }
         else
         {
-            if(mnode->parent == NULL)    //mnode == new
-            {
-                new = mnode->treenode2;
-                new->parent = NULL;
-            }
-            else                         //mnode != new
-            {
-                mnode->treenode2->parent = mnode->parent;
-                if(mnode->parent->treenode1 == mnode)
-                    mnode->parent->treenode1 = mnode->treenode2;
-                else
-                    mnode->parent->treenode2 = mnode->treenode2;
-            }
-            free(mnode);
+            newprog->illegal = 1;
+            return newprog;
         }
     }
-    
+    else if (actionNum >= 31 && actionNum < 40)
+    {
+        if (mnode->exp1 != NULL)
+        {
+            exp_* e = NULL;
+            switch (actionNum)
+            {
+                case 31:
+                    e = genexp_(newprog,0,0);
+                    break;
+                case 32:
+                    e = genexp_(newprog,0,1);
+                    break;
+                case 33:
+                    e = genexp_(newprog,0,2);
+                    break;
+                case 34:
+                    e = genexp_(newprog,0,3);
+                    break;
+                case 35:
+                    mnode->index = 0;
+                    break;
+                case 36:
+                    mnode->index = 1;
+                    break;
+                case 37:
+                    mnode->index = 2;
+                    break;
+                case 38:
+                    mnode->index = 3;
+                    break;
+                case 39:
+                    mnode->index = 4;
+                    break;
+            }
+            if (actionNum >= 31 && actionNum < 35) {
+                freeAll(NULL, NULL, NULL, NULL, mnode->exp1, 5);
+                mnode->exp1 = e;
+            }
+        }
+        else
+        {
+            newprog->illegal = 1;
+            return newprog;
+        }
+    }
+    //Insert Mutation types
+    treenode* newnode;
+    if (actionNum > 39 && actionNum < 42)
+    {
+        if(mnode->fixed == 1 || mnode->depth + mnode->height == newprog->maxdepth + 1 || mnode->depth == 2)
+        {
+            newprog->illegal = 1;
+            return newprog;
+        }
+        else
+        {
+            switch (actionNum)
+            {
+                case 40:
+                    newnode = createTreenode(0,0,NULL,NULL,NULL,NULL);
+                    condrandom = 311001111;
+                    newnode->cond1 = gencond_(newprog,5,condrandom);
+                    newnode->treenode1 = mnode;
+                    if(mnode->parent == NULL)
+                    {    //printf("first\n");
+                        mnode->parent = newnode;
+                        new = newnode;
+                    }
+                    else
+                    {
+                        if(mnode->parent->treenode1 == mnode)
+                            mnode->parent->treenode1 = newnode;
+                        else if(mnode->parent->treenode2 == mnode)
+                            mnode->parent->treenode2 = newnode;
+                        else
+                            printf("mutation type2 error!\n");
+                        
+                        newnode->parent = mnode->parent;
+                        mnode->parent = newnode;
+                        
+                    }
+                    break;
+                    
+                case 41:
+                    newnode = createTreenode(1,0,NULL,NULL,NULL,NULL);
+                    condrandom = 311001111;
+                    newnode->cond1 = gencond_(newprog,5,condrandom);
+                    newnode->treenode1 = mnode;
+                    if(mnode->parent == NULL)
+                    {    //printf("first\n");
+                        mnode->parent = newnode;
+                        new = newnode;
+                    }
+                    else
+                    {
+                        if(mnode->parent->treenode1 == mnode)
+                            mnode->parent->treenode1 = newnode;
+                        else if(mnode->parent->treenode2 == mnode)
+                            mnode->parent->treenode2 = newnode;
+                        else
+                            printf("mutation type2 error!\n");
+                        
+                        newnode->parent = mnode->parent;
+                        mnode->parent = newnode;
+                        
+                    }
+                    break;
+            }
+            
+        }
+        
+    }
+    else if(actionNum > 41 && actionNum < 48 )
+    {
+        if(!(mnode->depth != 1 && mnode->numofstatements < 6 && mnode->depth == 2) && !(mnode->depth != 1 && mnode->numofstatements < 2 && mnode->depth != 2))
+        {
+            illegal = 1;
+            return newprog;
+        }
+        else{
+            switch (actionNum)
+            {
+                case 42:
+                    newnode = createTreenode(3,0,NULL,NULL,NULL,NULL);
+                    if(getStatement(mnode,0)->type != 1)
+                    {
+                        newnode->treenode1 = mnode;
+                        commandtypeVarindex[0] = 2;
+                        assignRandom = 0;
+                        newnode->treenode2 = genprog_(mnode->depth,newprog, commandtypeVarindex, assignRandom, NULL, 0);
+                    }
+                    else
+                    {
+                        newprog->illegal = 1;
+                        return newprog;
+                    }
+                    break;
+                case 43:
+                    newnode = createTreenode(3,0,NULL,NULL,NULL,NULL);
+                    if(getStatement(mnode,0)->type != 1)
+                    {
+                        if (mnode->depth == 3)
+                        {
+                            newnode->treenode1 = mnode;
+                            commandtypeVarindex[0] = 10;
+                            commandtypeVarindex[1] = 2;
+                            assignRandom = 11;
+                            condrandom = 311001111;
+                            newnode->treenode2 = genprog_(newprog->maxdepth,newprog, commandtypeVarindex, assignRandom,condrandom, 0);
+                        }
+                        else
+                        {
+                            newprog->illegal = 1;
+                            return newprog;
+                        }
+                    }
+                    else
+                    {
+                        newprog->illegal = 1;
+                        return newprog;
+                    }
+                    break;
+                case 44:
+                    newnode = createTreenode(3,0,NULL,NULL,NULL,NULL);
+                    if(getStatement(mnode,0)->type != 1)
+                    {
+                        if (mnode->depth == 3)
+                        {
+                            newnode->treenode1 = mnode;
+                            commandtypeVarindex[0] = 20;
+                            commandtypeVarindex[1] = 2;
+                            assignRandom = 11;
+                            condrandom = 311001111;
+                            newnode->treenode2 = genprog_(newprog->maxdepth,newprog, commandtypeVarindex, assignRandom,condrandom, 0);
+                        }
+                        else
+                        {
+                            newprog->illegal = 1;
+                            return newprog;
+                        }
+                    }
+                    else
+                    {
+                        newprog->illegal = 1;
+                        return newprog;
+                    }
+                    break;
+                case 45:
+                    newnode = createTreenode(3,0,NULL,NULL,NULL,NULL);
+                    if(getStatement(mnode,0)->type != 5)
+                    {
+                        newnode->treenode2 = mnode;
+                        commandtypeVarindex[0] = 2;
+                        assignRandom = 0;
+                        newnode->treenode1 = genprog_(mnode->depth,newprog, commandtypeVarindex, assignRandom, NULL, 0);
+                    }
+                    else
+                    {
+                        newprog->illegal = 1;
+                        return newprog;
+                    }
+                    break;
+                case 46:
+                    newnode = createTreenode(3,0,NULL,NULL,NULL,NULL);
+                    if(getStatement(mnode,0)->type != 5)
+                    {
+                        if (mnode->depth == 3)
+                        {
+                            newnode->treenode2 = mnode;
+                            commandtypeVarindex[0] = 10;
+                            commandtypeVarindex[1] = 2;
+                            assignRandom = 11;
+                            condrandom = 311001111;
+                            newnode->treenode1 = genprog_(newprog->maxdepth,newprog, commandtypeVarindex, assignRandom,condrandom, 0);
+                        }
+                        else
+                        {
+                            newprog->illegal = 1;
+                            return newprog;
+                        }
+                    }
+                    else
+                    {
+                        newprog->illegal = 1;
+                        return newprog;
+                    }
+                    break;
+                case 47:
+                    newnode = createTreenode(3,0,NULL,NULL,NULL,NULL);
+                    if(getStatement(mnode,0)->type != 5)
+                    {
+                        if (mnode->depth == 3)
+                        {
+                            newnode->treenode2 = mnode;
+                            commandtypeVarindex[0] = 20;
+                            commandtypeVarindex[1] = 2;
+                            assignRandom = 11;
+                            condrandom = 311001111;
+                            newnode->treenode1 = genprog_(newprog->maxdepth,newprog, commandtypeVarindex, assignRandom,condrandom, 0);
+                        }
+                        else
+                        {
+                            newprog->illegal = 1;
+                            return newprog;
+                        }
+                    }
+                    else
+                    {
+                        newprog->illegal = 1;
+                        return newprog;
+                    }
+                    break;
+            }
+        }
+        if(mnode->parent == NULL)
+        {
+            mnode->parent = newnode;
+            new = newnode;
+        }
+        else
+        {
+            if(mnode->parent->treenode1 == mnode)
+                mnode->parent->treenode1 = newnode;
+            else
+                mnode->parent->treenode2 = newnode;
+            newnode->parent = mnode->parent;
+            mnode->parent = newnode;
+        }
+    }
+    //Reduction Mutation type
+    else if(actionNum > 47 && actionNum < 50 )
+    {
+        
+        switch (actionNum) {
+            case 48:
+                if (mnode->treenode1 != NULL && mnode->treenode1->fixed == 0 && (mnode->treenode2 == NULL || mnode->treenode2->fixed == 0))
+                {
+                    if(mnode->parent == NULL)    //mnode == new
+                    {
+                        new = mnode->treenode1;
+                        new->parent = NULL;
+                    }
+                    else                         //mnode != new
+                    {
+                        mnode->treenode1->parent = mnode->parent;
+                        if(mnode->parent->treenode1 == mnode)
+                            mnode->parent->treenode1 = mnode->treenode1;
+                        else
+                            mnode->parent->treenode2 = mnode->treenode1;
+                    }
+                    free(mnode);
+                }
+                else
+                {
+                    newprog->illegal = 1;
+                    return newprog;
+                }
+                break;
+            case 49:
+                if (mnode->treenode2 != NULL && mnode->treenode2->fixed == 0 && (mnode->treenode1 == NULL && mnode->treenode1->fixed == 0 ))
+                {
+                    if(mnode->parent == NULL)    //mnode == new
+                    {
+                        new = mnode->treenode2;
+                        new->parent = NULL;
+                    }
+                    else                         //mnode != new
+                    {
+                        mnode->treenode2->parent = mnode->parent;
+                        if(mnode->parent->treenode1 == mnode)
+                            mnode->parent->treenode1 = mnode->treenode2;
+                        else
+                            mnode->parent->treenode2 = mnode->treenode2;
+                    }
+                    // freeAll(NULL, NULL, mnode, NULL, NULL, 3);
+                    free(mnode);
+                }
+                else
+                {
+                    newprog->illegal = 1;
+                    return newprog;
+                }
+                
+                break;
+        }
+    }
     newprog->root = new;
     return newprog;
 }
-
 
 long setConrandom(int a, int b, int c, int d, int e, int f, int g)
 {
@@ -4118,6 +4697,7 @@ program* initProg(Expr** requirements ,int numofrequirements,double* coef)
         //printf("init candidate %d:%lf\n",i,candidate[i]->fitness);
         for(int j = 0;j < numofrequirements;j++)
             candidate[i]->propertyfit[j] = org->progs[0]->propertyfit[j];
+        candidate[i]->checkedBySpin = 0;
         freeAll(org,NULL,NULL,NULL,NULL,1);
         
     }
@@ -4125,21 +4705,100 @@ program* initProg(Expr** requirements ,int numofrequirements,double* coef)
     return candidate[0];
 }
 
-program* mutation_(program* candidate0, int nodeNum, int actType,Expr** requirements ,int numofrequirements,double* coef)
+program* mutation_(program* candidate0, int nodeNum, int actType, Expr** requirements ,int numofrequirements,double* coef)
 {
-    program* candidate1 = NULL;
-    candidate1 = copyProgram(candidate0);
-    setAll(candidate1);
-    candidate1->fitness = candidate0->fitness;
-    program* newcandidate = (program*)malloc(sizeof(program));
-    newcandidate = mutation1(candidate1, nodeNum, actType);
+    program* newcandidate = NULL;
+    newcandidate = mutation1(candidate0, nodeNum, actType);
     setAll(newcandidate);
     printAst(newcandidate);
     organism* org = genOrganism(newcandidate);
     double candidatefit1 = calculateFitness(org,requirements,numofrequirements,coef);
     newcandidate->fitness = candidatefit1;
+    for(int j = 0;j < numofrequirements;j++)
+        newcandidate->propertyfit[j] = org->progs[0]->propertyfit[j];
+    freeAll(NULL, candidate0, NULL, NULL, NULL, 2);
     freeAll(org,NULL,NULL,NULL,NULL,1);
     return newcandidate;
 }
 
-
+int spin_(program* candidate)
+{
+    int numofspin = 0;
+    int numofsolution = 0;
+    int right = 0;
+    int reward = 0;
+    
+    if(candidate->propertyfit[0] >0.99999 && candidate->checkedBySpin == 0 && candidate->fitness > 78.4)
+    {
+        candidate->checkedBySpin = 1;
+        organism* org = genOrganism(candidate);
+        
+        /*printf("%d,Template:\n",i);
+         printprog(candidate[j]->root,0,candidate[j]);
+         printf("program0:\n");
+         printprog(org->progs[0]->root,0,org->progs[0]);
+         printf("program1:\n");
+         printprog(org->progs[1]->root,0,org->progs[1]);*/
+        
+        // FILE* f;
+        char filename[60] = "./output/mutex.pml";
+        FILE *f;
+        // f = fopen("/Users/zhuang/workspace-gp/testSwig2/output/mutex.pml","w+");
+        if(f = fopen( filename, "w"))
+        {
+            orgToPml(org,f);
+        }
+        //sleep(2);
+        fclose(f);
+        
+        char command[100] = "spin -a ";
+        strcat(command,filename);
+        strcat(command," > useless");
+        
+        
+        system(command);
+        system("gcc -DMEMLIM=1024 -O2 -DXUSAFE -w -o pan pan.c");
+        
+        numofspin++;
+        system("./pan -m10000 -a -f -N e1 > pan1.out");
+        int r1 = system("grep -q -e \"errors: 0\" pan1.out");
+        if(r1 == 0)
+            reward += 10;
+        
+        numofspin++;
+        system("./pan -m10000 -a -f -N e2 > pan2.out");
+        int r2 = system("grep -q -e \"errors: 0\" pan2.out");
+        if(r2 == 0)
+            reward += 5;
+        
+        numofspin++;
+        system("./pan -m10000 -a -f -N e3 > pan3.out");
+        int r3 = system("grep -q -e \"errors: 0\" pan3.out");
+        if(r3 == 0)
+            reward += 5;
+        
+        if (reward == 20) {
+            printprog(candidate->root,0,candidate);
+            printprog(org->progs[0]->root,0,org->progs[0]);
+            printprog(org->progs[1]->root,0,org->progs[1]);
+            printf("\n");
+            right = 1;
+        }
+        
+        if (right == 1) {
+            FILE* f;
+            char filename[100] = "./output/mutexCorrect";
+            // strcat(filename,iToStr(1));
+            strcat(filename,".pml");
+            if(f = fopen(filename,"w"))
+            {
+                orgToPml(org,f);
+            }
+            fclose(f);
+        }
+        
+        freeAll(org,NULL,NULL,NULL,NULL,1);
+    }
+    
+    return reward;
+}

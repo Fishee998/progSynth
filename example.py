@@ -112,6 +112,34 @@ def get_fitness(org):
     return _example.get_fitness(org)
 get_fitness = _example.get_fitness
 
+def illegal(org):
+    return _example.illegal(org)
+illegal = _example.illegal
+
+def action2Len(action2):
+    return _example.action2Len(action2)
+action2Len = _example.action2Len
+
+def get_action2(action2, index):
+    return _example.get_action2(action2, index)
+get_action2 = _example.get_action2
+
+def getPropertyfit(org):
+    return _example.getPropertyfit(org)
+getPropertyfit = _example.getPropertyfit
+
+def getCheckedBySpin(org):
+    return _example.getCheckedBySpin(org)
+getCheckedBySpin = _example.getCheckedBySpin
+
+def spin_(candidate):
+    return _example.spin_(candidate)
+spin_ = _example.spin_
+
+def getLegalAction2(parent, nodeNum):
+    return _example.getLegalAction2(parent, nodeNum)
+getLegalAction2 = _example.getLegalAction2
+
 def mutation1(parent, nodeNum, actionType):
     return _example.mutation1(parent, nodeNum, actionType)
 mutation1 = _example.mutation1

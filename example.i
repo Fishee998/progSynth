@@ -16,17 +16,42 @@ program* neicun()
     program* newcandidate = (program*)malloc(sizeof(program));
     return newcandidate;
 }
+
 program* set_fitness(program* org, double fitnessValue)
 {
     org->fitness = fitnessValue;
     return org;
 }
+
 double get_fitness(program* org)
 {
     return org->fitness;
 }
+
+int illegal(program* org)
+{
+    return org->illegal;
+}
+int action2Len(int* action2)
+{
+    return sizeof(action2);
+}
+int get_action2(int* action2, int index)
+{
+    return action2[index];
+}
+double getPropertyfit(program* org)
+{
+    return org->propertyfit[0];
+}
+int getCheckedBySpin(program* org)
+{
+    return org->checkedBySpin;
+}
 %}
 
+extern int spin_(program* candidate);
+extern int* getLegalAction2(program* parent, int nodeNum);
 extern program* mutation1(program* parent, int nodeNum, int actionType);
 extern void printAst(program* prog);
 extern double* set_coef(int numofrequirements);

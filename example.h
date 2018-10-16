@@ -105,6 +105,7 @@ typedef struct program
     int numofevent[7];
     double propertyfit[7];
     int checkedBySpin;
+    int illegal;
 }program;
 
 typedef struct organism
@@ -276,5 +277,7 @@ action* setAction(int layer, int actionType);
 program* mutation_(program* candidate0, int nodeNum, int actType,Expr** requirements ,int numofrequirements,double* coef);
 program* initProg(Expr** requirements ,int numofrequirements,double* coef);
 void outputLog_(char* str);
-
+int mutationCond_(cond* root,program* prog,int type, int action);
+int* getLegalAction2(program* parent, int nodeNum);
+int spin_(program* candidate);
 #endif

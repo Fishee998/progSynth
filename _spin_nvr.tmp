@@ -1,0 +1,31 @@
+never e1 {    /* !([] (((cs0+cs1)<=1))) */
+T0_init:
+	do
+	:: atomic { (! ((((cs0+cs1)<=1)))) -> assert(!(! ((((cs0+cs1)<=1))))) }
+	:: (1) -> goto T0_init
+	od;
+accept_all:
+	skip
+}
+never e2 {    /* !([] ((! ((try0==1))) || (<> ((cs0==1))))) */
+T0_init:
+	do
+	:: (! ((! ((try0==1)))) && ! (((cs0==1)))) -> goto accept_S4
+	:: (1) -> goto T0_init
+	od;
+accept_S4:
+	do
+	:: (! (((cs0==1)))) -> goto accept_S4
+	od;
+}
+never e3 {    /* !([] ((! ((try1==1))) || (<> ((cs1==1))))) */
+T0_init:
+	do
+	:: (! ((! ((try1==1)))) && ! (((cs1==1)))) -> goto accept_S4
+	:: (1) -> goto T0_init
+	od;
+accept_S4:
+	do
+	:: (! (((cs1==1)))) -> goto accept_S4
+	od;
+}

@@ -1,22 +1,24 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
-
 class MLP(nn.Module):
 
     def __init__(self,):
         super(MLP, self,).__init__()
 
 
-    def creat2(self,state_n,action_n):
+    def creat2(self,state_n,action_1,action_2):
         self.fc1 = nn.Linear(state_n, 50)
         self.fc1.weight.data.normal_(0, 0.1)
-        self.out = nn.Linear(50, action_n)
-        self.out.weight.data.normal_(0, 0.1)
+        self.out1 = nn.Linear(50, action_1)
+        self.out1.weight.data.normal_(0, 0.1)
+        self.out2 = nn.Linear(50, action_2)
+        self.out2.weight.data.normal_(0, 0.1)
 
-
-    def forward(self, x):
-        x = self.fc1(x)
+    def forward(self, state):
+        x = self.fc1(state)
         x = F.relu(x)
-        actions_value = self.out(x)
-        return actions_value
+        action1_value = self.out1(x)
+        action2_value = self.out2(x)
+        return action1_value, action2_value
+

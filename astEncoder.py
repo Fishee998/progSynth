@@ -54,6 +54,8 @@ def getAstDict():
                 print "error"
             nodeDict = {}
             nodeNumber = sample.split("node")[0]
+            if sample == samples[0]:
+                nodeDict['number'] = int(nodeNumber[-1])
             nodeDict['number'] = int(nodeNumber)
             node = sample.split("node:")[1].split(";")[0]
             nodeDict['name'] = node
@@ -241,12 +243,13 @@ def get_action1(action_layer234, ast, actionSet):
 def setAction1s(info_):
     treenode = ["assign", "if", "while"]
     actIndex = []
+    for index in range(50):
+        actIndex.append(0)
     for index in info_.astActNodes:
-        if int(index) == 0 or info_.ast[int(index)]['name'] not in treenode:
-            actIndex.append(0)
-        else:
-            actIndex.append(1)
-    info_.actIndex = actIndex
+        a = int(index)
+        if a != 0 and info_.ast[a]['name'] in treenode:
+            actIndex[a] = 1
+    # info_.actIndex = actIndex
     return actIndex
 
 
